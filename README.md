@@ -1,5 +1,7 @@
 # Live (GitHub-Flavored) Markdown Editor
 
+Note: Forked from [here](https://github.com/jbt/markdown-editor), I did not make this but modified it.
+
 ## Usage
 
 [Use it here](//jbt.github.io/markdown-editor). The live markdown reader will display a preview as you type.

@@ -84,7 +84,7 @@ function setOutput(val) {
     var old = out.cloneNode(true);
     out.innerHTML = md.render(val);
     emojify.run(out);
-    console.log(out.innerHTML);
+    // console.log(out.innerHTML);
     // Checks if there are any task-list present in out.innerHTML
     out.innerHTML = render_tasklist(out.innerHTML);
 
@@ -218,10 +218,10 @@ function hideMenu() {
 function openFile(evt) {
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         var files = evt.target.files;
-        console.log(files);
+        // console.log(files);
         var reader = new FileReader();
         reader.onload = function(file) {
-            console.log(file.target.result);
+            // console.log(file.target.result);
             editor.setValue(file.target.result);
             return true;
         };
@@ -329,6 +329,7 @@ function processQueryParams() {
 }
 
 function start() {
+    toggleSpellCheck(document.getElementById('spellbutton')); // disabling the spellchecker by default
     processQueryParams();
     if (window.location.hash) {
         var h = window.location.hash.replace(/^#/, '');
@@ -360,7 +361,9 @@ window.addEventListener("beforeunload", function (e) {
     }
     var confirmationMessage = 'It looks like you have been editing something. '
                             + 'If you leave before saving, your changes will be lost.';
-    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    if (document.getElementsByClassName('CodeMirror-code')[0].innerText !== '# New Document') {
+        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    }
     return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
 });
 
