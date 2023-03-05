@@ -2,6 +2,8 @@ var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 navigator.saveBlob = navigator.saveBlob || navigator.msSaveBlob || navigator.mozSaveBlob || navigator.webkitSaveBlob;
 window.saveAs = window.saveAs || window.webkitSaveAs || window.mozSaveAs || window.msSaveAs;
 
+var contentModified = 0; // will be modified once at startup.
+
 // Because highlight.js is a bit awkward at times
 var languageOverrides = {
     js: 'javascript',
@@ -31,6 +33,7 @@ var md = markdownit({
 var hashto;
 
 function update(e) {
+    ++contentModified;
     setOutput(e.getValue());
 
     //If a title is added to the document it will be the new document.title, otherwise use default
@@ -356,12 +359,12 @@ function start() {
 }
 
 window.addEventListener("beforeunload", function (e) {
-    if (!editor.getValue() || editor.getValue() == localStorage.getItem('content')) {
+    if (editor.getValue() == localStorage.getItem('content')) {
         return;
     }
     var confirmationMessage = 'It looks like you have been editing something. '
                             + 'If you leave before saving, your changes will be lost.';
-    if (document.getElementsByClassName('CodeMirror-code')[0].innerText !== '# New Document') {
+    if (contentModified > 1) {
         (e || window.event).returnValue = confirmationMessage; //Gecko + IE
     }
     return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
