@@ -2,7 +2,7 @@ var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 navigator.saveBlob = navigator.saveBlob || navigator.msSaveBlob || navigator.mozSaveBlob || navigator.webkitSaveBlob;
 window.saveAs = window.saveAs || window.webkitSaveAs || window.mozSaveAs || window.msSaveAs;
 
-var contentModified = 0; // will be modified once at startup.
+var contentModified = -1; // will be modified once at startup.
 
 // Because highlight.js is a bit awkward at times
 var languageOverrides = {
@@ -219,19 +219,22 @@ function hideMenu() {
 }
 
 function openFile(evt) {
-    if (window.File && window.FileReader && window.FileList && window.Blob) {
-        var files = evt.target.files;
-        // console.log(files);
-        var reader = new FileReader();
-        reader.onload = function(file) {
-            // console.log(file.target.result);
-            editor.setValue(file.target.result);
-            return true;
-        };
-        reader.readAsText(files[0]);
-
-    } else {
-        alert('The File APIs are not fully supported in this browser.');
+    if (contentModified <= 0 || confirm(
+        "Are you sure you want to load a new file?\nInformation you’ve entered may not be saved.")) {
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+            var files = evt.target.files;
+            // console.log(files);
+            var reader = new FileReader();
+            reader.onload = function(file) {
+                // console.log(file.target.result);
+                editor.setValue(file.target.result);
+                contentModified = 0;
+                return true;
+            };
+            reader.readAsText(files[0]);
+        } else {
+            alert('The File APIs are not fully supported in this browser.');
+        }
     }
 }
 
@@ -364,7 +367,7 @@ window.addEventListener("beforeunload", function (e) {
     }
     var confirmationMessage = 'It looks like you have been editing something. '
                             + 'If you leave before saving, your changes will be lost.';
-    if (contentModified > 1) {
+    if (contentModified > 0) {
         (e || window.event).returnValue = confirmationMessage; //Gecko + IE
     }
     return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
